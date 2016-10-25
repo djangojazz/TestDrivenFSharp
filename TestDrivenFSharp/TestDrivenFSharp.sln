@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Test", "Test\Test.fsproj", "{6F5A6739-CD16-4F93-BAC9-2BF6E76E7149}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestDrivenFSharp", "TestDrivenFSharp.fsproj", "{20E641B4-AA4B-427F-8F97-1A2C6641439E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F5A6739-CD16-4F93-BAC9-2BF6E76E7149}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F5A6739-CD16-4F93-BAC9-2BF6E76E7149}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F5A6739-CD16-4F93-BAC9-2BF6E76E7149}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F5A6739-CD16-4F93-BAC9-2BF6E76E7149}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
