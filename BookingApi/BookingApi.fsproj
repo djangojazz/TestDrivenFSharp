@@ -52,14 +52,6 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Content Include="packages.config" />
-    <Compile Include="Rop.fs" />
-    <Compile Include="ApiModel.fs" />
-    <Compile Include="SqlGateway.fs" />
-    <Content Include="App_Data\BookingDatabase.mdf" />
-    <Content Include="App_Data\BookingDatabase_log.ldf" />
-    <None Include="Global.asax" />
-    <Compile Include="Global.fs" />
-    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
