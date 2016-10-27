@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BookingApi", "BookingApi\Bo
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BookingApi.UnitTests", "BookingApi.UnitTests\BookingApi.UnitTests.fsproj", "{321FAD28-99DD-4A3E-B076-21727F2E1F40}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestDrivenFSharp", "TestDrivenFSharp\TestDrivenFSharp.fsproj", "{20E641B4-AA4B-427F-8F97-1A2C6641439E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{321FAD28-99DD-4A3E-B076-21727F2E1F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{321FAD28-99DD-4A3E-B076-21727F2E1F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{321FAD28-99DD-4A3E-B076-21727F2E1F40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E641B4-AA4B-427F-8F97-1A2C6641439E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
