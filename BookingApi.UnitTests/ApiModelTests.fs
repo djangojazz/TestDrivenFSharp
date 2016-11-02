@@ -7,6 +7,7 @@ open Ploeh.Samples.Rop
 open Ploeh.Samples.BookingApi
 
 module ValidateTests = 
+
   [<Fact>]
   let ``Validate.reservationValid returns correct result on valid date`` ()=
     let rendition : ReservationRendition = {
@@ -18,13 +19,13 @@ module ValidateTests =
     let actual = Validate.reservationValid rendition
 
     let expected = Success {
-      Date = 
-        DateTimeOffset(
-          DateTime(2015, 4, 15), 
-          TimeSpan.FromHours 2.)
-      Name = "Brett Morin"
-      Email = "bmorin@a.com"
-      Quantity = 4 }
+        Date = 
+          DateTimeOffset(
+            DateTime(2015, 4, 15), 
+            TimeSpan.FromHours 2.)
+        Name = "Brett Morin"
+        Email = "bmorin@a.com"
+        Quantity = 4 }
     expected =? actual
 
   [<Fact>]
@@ -40,6 +41,57 @@ module ValidateTests =
     let expected : Result<Reservation, Error> =
       Failure(ValidationError("Invalid date."))
     expected =? actual
+
+module CapacityTests = 
+  
+[<Fact>]
+let ``Capacity.check returns correct result at no prior reservations`` ()=
+  let capacity = 10
+  let getReservedSeats _ = 0
+  let reservation = {
+      Date = 
+        DateTimeOffset(
+          DateTime(2015, 4, 15), 
+          TimeSpan.FromHours 2.)
+      Name = "Brett Morin"
+      Email = "bmorin@a.com"
+      Quantity = 4 }
+
+  let actual = 
+    Capacity.check 
+      capacity 
+      getReservedSeats 
+      reservation
+
+  let expected : Result<Reservation, Error> = 
+    Success reservation
+
+  expected =? actual
+
+[<Fact>]
+let ``Capacity.check returns correct result at too little remaining capacity`` ()=
+  let capacity = 10
+  let getReservedSeats _ = 7
+  let reservation = {
+      Date = 
+        DateTimeOffset(
+          DateTime(2015, 4, 15), 
+          TimeSpan.FromHours 2.)
+      Name = "Brett Morin"
+      Email = "bmorin@a.com"
+      Quantity = 4 }
+
+  let actual = 
+    Capacity.check 
+      capacity 
+      getReservedSeats 
+      reservation
+
+  let expected : Result<Reservation, Error> = 
+    Failure CapacityExceeded
+
+  expected =? actual
+
 
 module ControllerTests =
 

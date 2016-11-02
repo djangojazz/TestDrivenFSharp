@@ -13,6 +13,7 @@ type ReservationRendition = {
 
 type Error =
 | ValidationError of string
+| CapacityExceeded
 
 type Reservation = {
   Date: DateTimeOffset
@@ -31,6 +32,12 @@ module Validate =
         Quantity = rendition.Quantity }
     | _ -> Failure(ValidationError "Invalid date.")
 
+module Capacity =
+  let check capacity getReservedSeats reservation =
+    let reservedSeats = getReservedSeats reservation.Date
+    if capacity < reservation.Quantity + reservedSeats
+    then Failure CapacityExceeded
+    else Success reservation
 
 type ReservationsController(imp) =
   inherit ApiController()
