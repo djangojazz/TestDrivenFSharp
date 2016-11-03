@@ -3,6 +3,7 @@
 open System.Web.Http
 open System
 open Ploeh.Samples.Rop
+open System.Net
 
 [<CLIMutable>]
 type ReservationRendition = {
@@ -42,4 +43,9 @@ module Capacity =
 type ReservationsController(imp) =
   inherit ApiController()
   member this.Post (rendition : ReservationRendition) : IHttpActionResult =
-    this.Ok() :> _
+    match imp rendition with 
+    | Failure(ValidationError msg) ->
+        this.BadRequest msg :> _
+    | Failure CapacityExceeded ->
+        this.StatusCode HttpStatusCode.Forbidden :> _
+    | Success() -> this.Ok() :> _

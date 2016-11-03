@@ -95,10 +95,11 @@ let ``Capacity.check returns correct result at too little remaining capacity`` (
 
 module ControllerTests =
 
-  open System.Web.Http
+open System.Web.Http
+open System.Net
 
-  [<Fact>]
-  let ``ReservationsController.Post returns correct result on Success`` () =
+[<Fact>]
+let ``ReservationsController.Post returns correct result on Success`` () =
     let imp _ = Success ()
     use sut = new ReservationsController(imp)
     let rendition : ReservationRendition = {
@@ -110,3 +111,39 @@ module ControllerTests =
     let result : IHttpActionResult = sut.Post rendition
 
     test <@ result :? Results.OkResult @>
+
+[<Fact>]
+let ``ReservationsController.Post returns correct result on Validation Error`` () =
+    let imp _ = Failure(ValidationError "Invalid date.")
+    use sut = new ReservationsController(imp)
+    let rendition : ReservationRendition = {
+        Date = "2015-04-15+2:00"
+        Name = "Brett Morin"
+        Email = "bmorin@a.com"
+        Quantity = 5 }
+
+    let result = sut.Post rendition
+
+    test <@ result :? Results.BadRequestErrorMessageResult @>
+
+let convertsTo<'a> candidate = 
+    match box candidate with
+    | :? 'a as converted -> Some converted
+    | _ -> None
+
+[<Fact>]
+let ``ReservationsController.Post returns correct result on capactiy exceeded`` () =
+    let imp _ = Failure CapacityExceeded
+    use sut = new ReservationsController(imp)
+    let rendition : ReservationRendition = {
+        Date = "2015-04-14+2:00"
+        Name = "Brett Morin"
+        Email = "bmorin@a.com"
+        Quantity = 5 }
+
+    let result = sut.Post rendition
+
+    test <@ result 
+        |> convertsTo<Results.StatusCodeResult> 
+        |> Option.map (fun x -> x.StatusCode) 
+        |> Option.exists ((=) HttpStatusCode.Forbidden) @>
