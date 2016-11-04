@@ -40,6 +40,10 @@ module Capacity =
     then Failure CapacityExceeded
     else Success reservation
 
+type HomeController() =
+    inherit ApiController()
+    member this.Get() = this.Ok()
+
 type ReservationsController(imp) =
   inherit ApiController()
   member this.Post (rendition : ReservationRendition) : IHttpActionResult =
