@@ -96,6 +96,7 @@
     <Content Include="packages.config" />
     <Compile Include="Rop.fs" />
     <Compile Include="ApiModel.fs" />
+    <Compile Include="SqlGateway.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
