@@ -2,148 +2,114 @@
 
 open System
 open Swensen.Unquote
-open Xunit
+open FsCheck
+open FsCheck.Xunit
 open Ploeh.Samples.Rop
 open Ploeh.Samples.BookingApi
 
 module ValidateTests = 
 
-  [<Fact>]
-  let ``Validate.reservationValid returns correct result on valid date`` ()=
-    let rendition : ReservationRendition = {
-      Date = "2015-04-15+2:00"
-      Name = "Brett Morin"
-      Email = "bmorin@a.com"
-      Quantity = 4 }
+  [<Property>]
+  let ``Validate.reservationValid returns correct result on valid date`` 
+    (rendition : ReservationRendition) 
+    (date: DateTimeOffset) =
+
+    let rendition = { rendition with Date = date.ToString "o" }
 
     let actual = Validate.reservationValid rendition
 
     let expected = Success {
-        Date = 
-          DateTimeOffset(
-            DateTime(2015, 4, 15), 
-            TimeSpan.FromHours 2.)
-        Name = "Brett Morin"
-        Email = "bmorin@a.com"
-        Quantity = 4 }
-    expected =? actual
+        Date = date
+        Name = rendition.Name
+        Email = rendition.Email
+        Quantity = rendition.Quantity }
+    expected = actual
 
-  [<Fact>]
-  let ``Validate.reservationValid returns correct result on invalid date`` ()=
-    let rendition : ReservationRendition = {
-      Date = "Not a valid date"
-      Name = "Brett Morin"
-      Email = "bmorin@a.com"
-      Quantity = 4 }
+  [<Property>]
+  let ``Validate.reservationValid returns correct result on invalid date``
+    (rendition : ReservationRendition)  = 
+    not(fst(DateTimeOffset.TryParse rendition.Date)) ==> lazy
 
     let actual = Validate.reservationValid rendition
 
     let expected : Result<Reservation, Error> =
       Failure(ValidationError("Invalid date."))
-    expected =? actual
+    expected = actual
 
 module CapacityTests = 
   
-[<Fact>]
-let ``Capacity.check returns correct result at no prior reservations`` ()=
-  let capacity = 10
-  let getReservedSeats _ = 0
-  let reservation = {
-      Date = 
-        DateTimeOffset(
-          DateTime(2015, 4, 15), 
-          TimeSpan.FromHours 2.)
-      Name = "Brett Morin"
-      Email = "bmorin@a.com"
-      Quantity = 4 }
+[<Property>]
+let ``Capacity.check returns correct result at no prior reservations`` 
+    (reservation: Reservation)
+    (excessCapacity: int) =
+    (reservation.Quantity >= 0 && excessCapacity >= 0) ==> lazy
 
-  let actual = 
-    Capacity.check 
-      capacity 
-      getReservedSeats 
-      reservation
+      let capacity = reservation.Quantity + excessCapacity
+      let getReservedSeats _ = 0
 
-  let expected : Result<Reservation, Error> = 
-    Success reservation
+      let actual = Capacity.check capacity getReservedSeats reservation
 
-  expected =? actual
+      let expected : Result<Reservation, Error> = Success reservation
 
-[<Fact>]
-let ``Capacity.check returns correct result at too little remaining capacity`` ()=
-  let capacity = 10
-  let getReservedSeats _ = 7
-  let reservation = {
-      Date = 
-        DateTimeOffset(
-          DateTime(2015, 4, 15), 
-          TimeSpan.FromHours 2.)
-      Name = "Brett Morin"
-      Email = "bmorin@a.com"
-      Quantity = 4 }
+      expected = actual
 
-  let actual = 
-    Capacity.check 
-      capacity 
-      getReservedSeats 
-      reservation
+[<Property>]
+let ``Capacity.check returns correct result at too little remaining capacity``
+    (reservation: Reservation)
+    (capacity: int) 
+    (reservedSeats: int) =
+    (capacity >= 0 && reservedSeats >= 0 && capacity < reservedSeats + reservation.Quantity) ==> lazy
 
-  let expected : Result<Reservation, Error> = 
-    Failure CapacityExceeded
+  let getReservedSeats _ = reservedSeats
 
-  expected =? actual
+  let actual = Capacity.check  capacity getReservedSeats reservation
 
+  let expected : Result<Reservation, Error> =  Failure CapacityExceeded
+
+  expected = actual
 
 module ControllerTests =
 
 open System.Web.Http
 open System.Net
 
-[<Fact>]
-let ``ReservationsController.Post returns correct result on Success`` () =
+[<Property>]
+let ``ReservationsController.Post returns correct result on Success`` 
+    (rendition : ReservationRendition) =
+
     let imp _ = Success ()
     use sut = new ReservationsController(imp)
-    let rendition : ReservationRendition = {
-        Date = "2015-04-15+2:00"
-        Name = "Brett Morin"
-        Email = "bmorin@a.com"
-        Quantity = 5 }
 
     let result : IHttpActionResult = sut.Post rendition
 
-    test <@ result :? Results.OkResult @>
+    result :? Results.OkResult
 
-[<Fact>]
-let ``ReservationsController.Post returns correct result on Validation Error`` () =
+[<Property>]
+let ``ReservationsController.Post returns correct result on Validation Error`` 
+    (rendition : ReservationRendition) =
+
     let imp _ = Failure(ValidationError "Invalid date.")
     use sut = new ReservationsController(imp)
-    let rendition : ReservationRendition = {
-        Date = "2015-04-15+2:00"
-        Name = "Brett Morin"
-        Email = "bmorin@a.com"
-        Quantity = 5 }
 
     let result = sut.Post rendition
 
-    test <@ result :? Results.BadRequestErrorMessageResult @>
+    result :? Results.BadRequestErrorMessageResult
 
 let convertsTo<'a> candidate = 
     match box candidate with
     | :? 'a as converted -> Some converted
     | _ -> None
 
-[<Fact>]
-let ``ReservationsController.Post returns correct result on capactiy exceeded`` () =
+[<Property>]
+let ``ReservationsController.Post returns correct result on capactiy exceeded`` 
+    (rendition : ReservationRendition) =
+
     let imp _ = Failure CapacityExceeded
     use sut = new ReservationsController(imp)
-    let rendition : ReservationRendition = {
-        Date = "2015-04-14+2:00"
-        Name = "Brett Morin"
-        Email = "bmorin@a.com"
-        Quantity = 5 }
 
     let result = sut.Post rendition
 
-    test <@ result 
+    result 
         |> convertsTo<Results.StatusCodeResult> 
         |> Option.map (fun x -> x.StatusCode) 
-        |> Option.exists ((=) HttpStatusCode.Forbidden) @>
+        |> Option.exists ((=) HttpStatusCode.Forbidden)
